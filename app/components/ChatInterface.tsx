@@ -1,8 +1,9 @@
-"use client"
+'use client'
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "./ui/button"
+import { Card } from "./ui/card"
 import DialogueBox from "./DialogueBox"
 import Swing from "./avatars/Swing"
 import Slide from "./avatars/Slide"
@@ -33,6 +34,7 @@ export default function ChatInterface({
   const [loading, setLoading] = useState(false)
   const [showInput, setShowInput] = useState(false)
   const [typingComplete, setTypingComplete] = useState(false)
+  const [hint, setHint] = useState<string | null>(null)
 
   const characterData: Record<string, { name: string; mood: any; Component: any }> = {
     swing: { name: 'Swing', mood: 'sad', Component: Swing },
@@ -47,9 +49,33 @@ export default function ChatInterface({
     setMessages([])
     setShowInput(false)
     setTypingComplete(false)
+    setHint(null)
     // Send initial greeting
     sendInitialGreeting()
   }, [character])
+
+  const getHint = async () => {
+    if (loading) return
+    setLoading(true)
+    try {
+      const response = await fetch('/api/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message: "Can you give me a hint?",
+          target_character: "detective",
+        }),
+      })
+      const data = await response.json()
+      setHint(data.response)
+    } catch (error) {
+      console.error('Failed to get hint:', error)
+      setHint("I seem to be lost in thought right now. Try asking one of the playground friends another question.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const sendInitialGreeting = async () => {
     setLoading(true)
@@ -94,6 +120,7 @@ export default function ChatInterface({
     setLoading(true)
     setShowInput(false)
     setTypingComplete(false)
+    setHint(null)
 
     try {
       const response = await fetch('/api/message', {
@@ -177,15 +204,48 @@ export default function ChatInterface({
         )}
       </AnimatePresence>
 
-      {/* Detective Dee (always visible, small) */}
-      <motion.div
+      {/* Detective Dee (clickable for hint) */}
+      <motion.button
+        onClick={getHint}
+        disabled={loading}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="absolute top-8 right-8"
+        whileHover={{ scale: 1.1, opacity: 1 }}
+        whileTap={{ scale: 0.9 }}
+        className="absolute top-8 right-8 cursor-pointer focus:outline-none group"
+        aria-label="Get a hint from Detective Dee"
       >
-        <DetectiveDee mood="thinking" className="w-16 h-16 opacity-60" />
-      </motion.div>
+        <DetectiveDee mood="thinking" className="w-16 h-16 opacity-60 group-hover:opacity-100 transition-opacity" />
+      </motion.button>
+
+      {/* Hint Bubble */}
+      <AnimatePresence>
+        {hint && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="absolute top-28 right-8 z-10"
+          >
+            <Card className="p-4 bg-indigo-100 border-2 border-indigo-400 shadow-xl max-w-xs relative">
+              <button
+                onClick={() => setHint(null)}
+                className="absolute top-2 right-2 w-6 h-6 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-xs z-10"
+              >
+                ✕
+              </button>
+              <div className="flex items-start gap-3">
+                <DetectiveDee mood="thinking" className="w-12 h-12 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-fredoka font-bold text-indigo-800">Detective Dee says:</h4>
+                  <p className="font-fredoka text-slate-800 text-sm">{hint}</p>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Messages Area */}
       <div className="flex-1 w-full flex flex-col justify-end space-y-6 mb-6">
