@@ -235,11 +235,4 @@ async def parent_session(session_id: str):
     }
 
 
-# Vercel serverless handler
-try:
-    from mangum import Mangum
-    handler = Mangum(app)
-except ImportError:
-    handler = None
-
 
