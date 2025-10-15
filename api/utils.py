@@ -51,3 +51,4 @@ async def call_llm_with_fallback(prompt: str, model_override: Optional[str] = No
     # Final fallback
     return "That's such a kind question. Let's think together about how our friends are feeling and what might help them."
 
+

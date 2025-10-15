@@ -78,3 +78,4 @@ def get_character_prompt(character: str) -> str:
     }
     return prompts.get(character, DETECTIVE_PROMPT)
 
+

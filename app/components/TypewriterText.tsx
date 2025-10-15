@@ -39,3 +39,4 @@ export default function TypewriterText({
   return <span className={className}>{displayedText}</span>
 }
 
+

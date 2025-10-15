@@ -31,3 +31,4 @@ export default function EmotionBadge({ emotion, isNew = false }: EmotionBadgePro
   )
 }
 
+
