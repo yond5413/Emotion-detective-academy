@@ -189,7 +189,7 @@ export default function CelebrationModal({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
-                className="flex gap-4 justify-center"
+                className="flex flex-wrap gap-4 justify-center"
               >
                 {sessionId && (
                   <Button
@@ -201,6 +201,14 @@ export default function CelebrationModal({
                     👨‍👩‍👧 View Parent Report
                   </Button>
                 )}
+                <Button
+                  onClick={onClose}
+                  variant="ghost"
+                  size="lg"
+                  className="font-fredoka"
+                >
+                  Close
+                </Button>
                 <Button
                   onClick={() => window.location.href = '/'}
                   size="lg"

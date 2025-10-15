@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import ChatInterface from '../components/ChatInterface'
 import DetectiveNotebook from '../components/DetectiveNotebook'
 import { Button } from '../components/ui/button'
+import { Card } from '../components/ui/card'
 import Swing from '../components/avatars/Swing'
 import Slide from '../components/avatars/Slide'
 import Tree from '../components/avatars/Tree'
@@ -17,6 +18,8 @@ export default function MysteryPage() {
   const [emotions, setEmotions] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [showIntro, setShowIntro] = useState(true)
+  const [hint, setHint] = useState<string | null>(null)
+  const [hintLoading, setHintLoading] = useState(false)
 
   useEffect(() => {
     // Start session on mount
@@ -40,6 +43,29 @@ export default function MysteryPage() {
     }
   }
 
+  const getHint = async () => {
+    if (hintLoading || !sessionId) return
+    setHintLoading(true)
+    try {
+      const response = await fetch('/api/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message: "Who should I talk to next? Give me a clue.",
+          target_character: "detective",
+        }),
+      })
+      const data = await response.json()
+      setHint(data.response)
+    } catch (error) {
+      console.error('Failed to get hint:', error)
+      setHint("I'm thinking... try talking to someone who seems sad.")
+    } finally {
+      setHintLoading(false)
+    }
+  }
+
   const handleClueCollected = (clue: string | null) => {
     if (clue && !clues.includes(clue)) {
       setClues([...clues, clue])
@@ -53,9 +79,9 @@ export default function MysteryPage() {
   }
 
   const characters = [
-    { id: 'swing', name: 'Swing', emoji: '🎢', Component: Swing, mood: 'sad' as const },
-    { id: 'slide', name: 'Slide', emoji: '🛝', Component: Slide, mood: 'worried' as const },
-    { id: 'tree', name: 'Tree', emoji: '🌳', Component: Tree, mood: 'wise' as const },
+    { id: 'swing', name: 'Swing', emoji: '🎢', Component: Swing, mood: 'sad' as const, description: "Feeling lonely lately..." },
+    { id: 'slide', name: 'Slide', emoji: '🛝', Component: Slide, mood: 'worried' as const, description: "Worried about something" },
+    { id: 'tree', name: 'Tree', emoji: '🌳', Component: Tree, mood: 'wise' as const, description: "Has seen everything" },
   ]
 
   if (loading || !sessionId) {
@@ -176,9 +202,7 @@ export default function MysteryPage() {
                       {char.emoji} {char.name}
                     </h3>
                     <p className="font-fredoka text-sm text-slate-600 text-center">
-                      {char.id === 'swing' && "Feeling lonely lately..."}
-                      {char.id === 'slide' && "Worried about something"}
-                      {char.id === 'tree' && "Has seen everything"}
+                      {char.description}
                     </p>
                   </div>
 
@@ -189,6 +213,47 @@ export default function MysteryPage() {
                 </motion.button>
               ))}
             </div>
+
+            <div className="mt-8 text-center relative">
+              <p className="font-fredoka text-slate-600 mb-2">Need a clue?</p>
+              <motion.button
+                onClick={getHint}
+                disabled={hintLoading}
+                className="inline-block z-10"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <DetectiveDee mood="thinking" className="w-20 h-20 opacity-80 hover:opacity-100 transition-opacity" />
+              </motion.button>
+
+              <AnimatePresence>
+                {hint && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-full max-w-sm"
+                  >
+                    <Card className="p-4 bg-indigo-100 border-2 border-indigo-400 shadow-xl relative">
+                      <button
+                        onClick={() => setHint(null)}
+                        className="absolute top-2 right-2 w-6 h-6 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-xs z-10"
+                      >
+                        ✕
+                      </button>
+                      <div className="flex items-start gap-3">
+                        <DetectiveDee mood="thinking" className="w-12 h-12 flex-shrink-0 mt-1" />
+                        <div>
+                          <h4 className="font-fredoka font-bold text-indigo-800">Hint:</h4>
+                          <p className="font-fredoka text-slate-800 text-sm">{hint}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
           </div>
         </motion.div>
       )}

@@ -74,7 +74,6 @@ export function SheetContent({
         side === "bottom" && "inset-x-0 bottom-0 h-full sm:h-96",
         className
       )}
-      {...props}
     >
       {children}
     </motion.div>

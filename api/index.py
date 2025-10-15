@@ -5,6 +5,10 @@ from typing import Optional, Dict, Any, List
 from uuid import uuid4
 from datetime import datetime
 import os
+from dotenv import load_dotenv, find_dotenv
+
+# Explicitly find and load the .env.local file
+load_dotenv(find_dotenv(filename='.env.local'))
 
 app = FastAPI(title="Emotion Detective Academy API")
 
@@ -121,13 +125,23 @@ async def send_message(req: MessageRequest):
 
     # Collect clues
     clue = None
-    if req.target_character == "swing" and not any("swing feels forgotten" in c for c in session["clues_collected"]):
+    llm_response_lower = llm_response.lower()
+
+    # Swing's clue
+    swing_clue_keywords = ["forgotten", "lonely", "left out", "nobody plays"]
+    if req.target_character == "swing" and not any("swing feels forgotten" in c for c in session["clues_collected"]) and any(keyword in llm_response_lower for keyword in swing_clue_keywords):
         clue = "Swing feels forgotten and lonely"
         session["clues_collected"].append(clue)
-    elif req.target_character == "slide" and not any("slide is worried" in c for c in session["clues_collected"]):
+    
+    # Slide's clue
+    slide_clue_keywords = ["worried", "concerned", "feel bad", "sad for swing"]
+    if req.target_character == "slide" and not any("slide is worried" in c for c in session["clues_collected"]) and any(keyword in llm_response_lower for keyword in slide_clue_keywords):
         clue = "Slide is worried about Swing's feelings"
         session["clues_collected"].append(clue)
-    elif req.target_character == "tree" and not any("tree sees both" in c for c in session["clues_collected"]):
+
+    # Tree's clue
+    tree_clue_keywords = ["both", "together", "include", "share", "friends"]
+    if req.target_character == "tree" and not any("tree sees both" in c for c in session["clues_collected"]) and any(keyword in llm_response_lower for keyword in tree_clue_keywords):
         clue = "Tree sees both friends want to be included"
         session["clues_collected"].append(clue)
 
