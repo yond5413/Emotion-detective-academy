@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "openrouter": {
+      "models": {
+        "qwen/qwen3-235b-a22b:free": { "name": "qwen/qwen3-235b-a22b:free" },
+        "deepseek/deepseek-chat-v3-0324:free": { "name": "deepseek/deepseek-chat-v3-0324:free" },
+        "moonshotai/kimi-dev-72b:free": { "name": "moonshotai/kimi-dev-72b:free" },
+        "z-ai/glm-4.5-air:free": { "name": "z-ai/glm-4.5-air:free" },
+        "openai/gpt-oss-20b:free": { "name": "openai/gpt-oss-20b:free" }
+      }
+    }
+  }
+}
