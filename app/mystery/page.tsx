@@ -170,7 +170,7 @@ export default function MysteryPage() {
                       whileHover={{ rotate: [0, -5, 5, -5, 0] }}
                       transition={{ duration: 0.5 }}
                     >
-                      <char.Component mood={char.mood} className="w-32 h-32 mb-4" />
+                      <char.Component mood={char.mood as any} className="w-32 h-32 mb-4" />
                     </motion.div>
                     <h3 className="font-fredoka text-2xl font-bold text-slate-800 mb-2">
                       {char.emoji} {char.name}

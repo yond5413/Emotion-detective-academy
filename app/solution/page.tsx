@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ import Swing from '../components/avatars/Swing'
 import Slide from '../components/avatars/Slide'
 import Tree from '../components/avatars/Tree'
 
-export default function SolutionPage() {
+function SolutionPageContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session')
   
@@ -240,5 +240,20 @@ export default function SolutionPage() {
         </Button>
       </Card>
     </motion.div>
+  )
+}
+
+export default function SolutionPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600 mx-auto mb-4"></div>
+          <p className="font-fredoka text-xl text-slate-700">Loading...</p>
+        </div>
+      </div>
+    }>
+      <SolutionPageContent />
+    </Suspense>
   )
 }

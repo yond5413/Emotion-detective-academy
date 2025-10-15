@@ -96,7 +96,7 @@ export default function Home() {
               className={`bg-gradient-to-br ${char.bg} rounded-3xl p-6 border-4 ${char.border} shadow-xl`}
             >
               <div className="flex flex-col items-center">
-                <char.Component mood={char.mood} className="w-32 h-32 mb-3" />
+                <char.Component mood={char.mood as any} className="w-32 h-32 mb-3" />
                 <p className="font-fredoka text-xl font-bold text-slate-800">{char.name}</p>
               </div>
             </motion.div>

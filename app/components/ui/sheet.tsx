@@ -27,15 +27,16 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
   )
 }
 
-interface SheetContentProps extends React.HTMLAttributes<HTMLDivElement> {
+interface SheetContentProps {
   side?: "left" | "right" | "top" | "bottom"
+  className?: string
+  children: React.ReactNode
 }
 
 export function SheetContent({
   side = "right",
   className,
   children,
-  ...props
 }: SheetContentProps) {
   const sideVariants = {
     right: {
@@ -74,7 +75,6 @@ export function SheetContent({
         side === "bottom" && "inset-x-0 bottom-0 h-full sm:h-96",
         className
       )}
-      {...props}
     >
       {children}
     </motion.div>
